@@ -11,7 +11,6 @@ struct inf {
     }
 };
 
-
 inf t[60 * MX];
 int sz = 0;
 int init() {
