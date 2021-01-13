@@ -51,13 +51,15 @@
 #define lb lower_bound
 #define ub upper_bound
 #define all(x) x.begin(), x.end()
+#define left leftkekmda
+#define right rightkekmda
 
 using namespace std;
 
 template<typename T1, typename T2>inline void mine(T1 &x, const T2 &y) { if (y < x) x = y; }
 template<typename T1, typename T2>inline void maxe(T1 &x, const T2 &y) { if (x < y) x = y; }
 
-ostream& operator << (ostream &out, const vector<int> &b) {
+template<typename T>ostream& operator << (ostream &out, const vector<T> &b) {
     for (auto k : b) out << k << ' ';
     return out;
 }
