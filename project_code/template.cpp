@@ -59,10 +59,15 @@ using namespace std;
 template<typename T1, typename T2>inline void mine(T1 &x, const T2 &y) { if (y < x) x = y; }
 template<typename T1, typename T2>inline void maxe(T1 &x, const T2 &y) { if (x < y) x = y; }
 
-template<typename T>ostream& operator << (ostream &out, const vector<T> &b) {
-    for (auto k : b) out << k << ' ';
-    return out;
+template<typename T> ostream& operator << (ostream &os, const vector<T> &b) {
+    for (auto &k : b) os << k << ' ';
+    return os;
 }
+template<typename T> istream& operator >> (istream &is, vector<T> &b) {
+    for (auto &k : b) is >> k;
+    return is;
+}
+
 
 typedef long long ll;
 typedef unsigned long long ull;
@@ -77,14 +82,6 @@ typedef vector<vpii> vvpii;
 typedef vector<ch> vch;
 typedef vector<vch> vvch;
 typedef vector<str> vs;
-
-
-
-const int MOD = 1000000007;
-const int INF = 1000000050;
-const long long BIG = (long long)2e18 + 50;
-const int MX = 200010;
-const double EPS = 1e-9;
 
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
