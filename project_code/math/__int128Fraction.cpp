@@ -1,10 +1,10 @@
-__int128 abs(__int128 x) {
+__int128 myabs(__int128 x) {
     return (x < 0 ? -x : x);
 }
 
 __int128 gcd(__int128 a, __int128 b) {
-    a = abs(a);
-    b = abs(b);
+    a = myabs(a);
+    b = myabs(b);
     while (b) {
         a %= b;
         swap(a, b);
@@ -28,16 +28,16 @@ struct fr {
         up /= g;
         down /= g;
     }
-    fr operator + (const fr & f) {
+    fr operator + (const fr & f) const {
         return fr(up * f.down + f.up * down, down * f.down);
     }
-    fr operator - (const fr & f) {
+    fr operator - (const fr & f) const {
         return fr(up * f.down - f.up * down, down * f.down);
     }
-    fr operator * (const fr & f) {
+    fr operator * (const fr & f) const {
         return fr(up * f.up, down * f.down);
     }
-    fr operator / (const fr & f) {
+    fr operator / (const fr & f) const {
         return fr(up * f.down, down * f.up);
     }
     void operator += (const fr & f) {
@@ -52,4 +52,40 @@ struct fr {
     void operator /= (const fr & f) {
         *this = *this / f;
     }
+    bool operator < (const fr & f) const {
+        return up * f.down < down * f.up;
+    }
+    bool operator == (const fr & f) const {
+        return up == f.up && down == f.down;
+    }
+    fr operator -() const {
+        return fr(-up, down);
+    }
 };
+
+ostream& operator << (ostream & os, const __int128 &x) {
+    __int128 y = x;
+    if (x < 0) {
+        cout << '-';
+        y = -y;
+    }
+    ll first = y / ((long long)1e18);
+    ll second = y % ((long long)1e18);
+    if (first != 0) {
+        string ssecond = to_string(second);
+        string filler(18 - ssecond.size(), '0');
+        os << first << filler <<  ssecond;
+    } else {
+        os << second;
+    }
+    return os;
+}
+
+ostream& operator << (ostream &os, const fr & f) {
+    os << f.up << "/" << f.down << '\n';
+    return os;
+}
+
+fr abs(const fr & f) {
+    return (f.up < 0 ? -f : f);
+}
