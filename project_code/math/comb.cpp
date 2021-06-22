@@ -1,8 +1,7 @@
-
-namespace comb {
+struct comb {
     M f[N];
     M fr[N];
-    void calcf() {
+    comb() {
         f[0] = 1;
         for (int i = 1; i < N; ++i)
             f[i] = f[i - 1] * i;
@@ -10,7 +9,6 @@ namespace comb {
         for (int i = N - 2; i >= 0; --i)
             fr[i] = fr[i + 1] * (i + 1);
     }
-    
     M C(int n, int k) {
         if (k > n || k < 0 || n < 0)
             return 0;
@@ -20,4 +18,4 @@ namespace comb {
         if (n == 0 && k == 0) return 1;
         return C(n - (mn - 1) * k - 1, k - 1);
     }
-}
+} comb;
