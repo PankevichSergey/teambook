@@ -63,20 +63,21 @@ struct fr {
     }
 };
 
-ostream& operator << (ostream & os, const __int128 &x) {
-    __int128 y = x;
-    if (x < 0) {
-        cout << '-';
-        y = -y;
-    }
-    ll first = y / ((long long)1e18);
-    ll second = y % ((long long)1e18);
-    if (first != 0) {
-        string ssecond = to_string(second);
-        string filler(18 - ssecond.size(), '0');
-        os << first << filler <<  ssecond;
+ostream& operator << (ostream & os, __int128 x) {
+    if (x == 0) {
+        os << '0';
     } else {
-        os << second;
+        if (x < 0) {
+            os << '-';
+            x *= -1;
+        }
+        string res;
+        while (x) {
+            res += char('0' + x % 10);
+            x /= 10;
+        }
+        reverse(all(res));
+        os << res;
     }
     return os;
 }
