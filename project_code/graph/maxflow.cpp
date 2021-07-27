@@ -52,7 +52,6 @@ struct dinic {
         }
         return dist[t] < INF;
     }
-
     vector<int> ptr;
     int dfs(int v, int curmin) {
         if (v == t) return curmin;
@@ -81,5 +80,4 @@ struct dinic {
         }       
         return flow;
     }
-    
 };
