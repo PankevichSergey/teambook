@@ -1,4 +1,4 @@
-//const int MOD = ;
+//const int MOD = 1e9 + 7;
 //const int N = ;
 namespace md {
     ll mod(ll n) {
@@ -44,8 +44,8 @@ struct M {
     M operator - (M y) const {
         return M(md::sub(x, y.x));
     }
-    M operator * (M y) const { return M(x * y.x); }
-    M operator / (M y) const { return M(x * md::rev(y.x)); }
+    M operator * (M y) const { return md::mult(x, y.x); }
+    M operator / (M y) const { return md::mult(x, md::rev(y.x)); }
     M operator + (ll y) { return (*this) + M(y); }
     M operator - (ll y) { return (*this) - M(y); }
     M operator * (ll y) { return (*this) * M(y); }
@@ -64,10 +64,10 @@ struct M {
     bool operator < (M y) const { return x < y.x; }
 };
 
-M operator * (int x, const M &y) {return y * x;}
-M operator + (int x, const M &y) {return y + x;}
-M operator - (int x, const M &y) {return y - x;}
-M operator / (int x, const M &y) {return y / x;}
+M operator * (ll x, const M &y) {return y * x;}
+M operator + (ll x, const M &y) {return y + x;}
+M operator - (ll x, const M &y) {return M(x) - y;}
+M operator / (ll x, const M &y) {return M(x) / y;}
 
 ostream& operator << (ostream& os, const M &a) {
     os << a.x;
