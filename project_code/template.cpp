@@ -112,26 +112,14 @@ using pld = pair<ld, ld>;
 using str = string;
 
 template<typename T> using V = vector<T>; 
+
 using vi = V<int>;
-using vch = V<char>;
-using vb = V<bool>;
 using vl = V<ll>;
-using vld = V<ld>;
-using vs = V<str>;
+using vch = V<char>;
 using vpii = V<pii>;
-using vpll = V<pll>;
-using vpld = V<pld>;
-
 using vvi = V<vi>;
-using vvch = V<vch>;
-using vvb = V<vb>;
 using vvl = V<vl>;
-using vvld = V<vld>;
-using vvs = V<vs>;
-using vvpii = V<vpii>;
-using vvpll = V<vpll>;
-using vvpld = V<vpld>;
-
+using vvch = V<vch>;
 
 
 
