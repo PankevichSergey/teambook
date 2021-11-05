@@ -34,13 +34,13 @@ using namespace std;
 
 
 // doesn't work in yandex
-// #pragma GCC target("avx2,bmi,bmi2,lzcnt,tzcnt,popcnt")
+// #pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
 
 // doesn't work in some judges
-// #pragma GCC target(“avx2,bmi,bmi2,lzcnt,tzcnt,popcnt,tune=native”)
+// #pragma GCC target(“avx2,bmi,bmi2,lzcnt,popcnt,tune=native”)
 
 // safe
-// #pragma GCC target("sse4.2,bmi,bmi2,lzcnt,tzcnt,popcnt")
+// #pragma GCC target("sse4.2,bmi,bmi2,lzcnt,popcnt")
 
 
 
@@ -159,7 +159,7 @@ int32_t main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0);
 
-    int t = 1;
-    //cin >> t;
-    while (t--) solve();
+    int test_ = 1;
+    //cin >> test_;
+    while (test_--) solve();
 }
