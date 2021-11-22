@@ -37,7 +37,7 @@ using namespace std;
 // #pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
 
 // doesn't work in some judges
-// #pragma GCC target(“avx2,bmi,bmi2,lzcnt,popcnt,tune=native”)
+// #pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt,tune=native")
 
 // safe
 // #pragma GCC target("sse4.2,bmi,bmi2,lzcnt,popcnt")
@@ -77,7 +77,7 @@ void dbg_out(Head H, Tail... T) {
   dbg_out(T...);
 }
  
-#ifdef LOCAL
+#ifdef LOCAL_SERGEY
 #define dbg(...) cerr << "[" << #__VA_ARGS__ << "]:", dbg_out(__VA_ARGS__)
 #else
 #define dbg(...)
@@ -158,8 +158,25 @@ void solve() {
 int32_t main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0);
+    #ifdef LOCAL_ALIKHAN
+        freopen("input.txt", "r", stdin);
+    #endif
+
+    #ifdef LOCAL_TEMIR
+        freopen("usr/share/man/man1/input.txt", "r", stdin);
+    #endif
+
+    
 
     int test_ = 1;
     //cin >> test_;
     while (test_--) solve();
+
+
+
+
+    #ifdef LOCAL_ALIKHAN
+        cout << "\nTime elapsed: " << double(clock()) / CLOCKS_PER_SEC << " s.\n";
+    #endif
+    return 0;
 }
