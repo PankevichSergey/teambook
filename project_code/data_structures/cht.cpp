@@ -20,7 +20,7 @@ struct line {
     }
 };
 
-const int N = 2e5 + 10;
+// const int N = 2e5 + 10;
 int sz = 0;
 line hull[N];
 void add(line l) {
