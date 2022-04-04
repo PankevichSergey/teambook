@@ -7,3 +7,4 @@ inline void * operator new ( size_t n ) {
 	assert(mpos <= MAX_MEM);
 	return (void *)res;
 }
+inline void operator delete ( void * ) { }
