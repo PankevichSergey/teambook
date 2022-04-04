@@ -13,7 +13,6 @@ struct SufAut {
     vector<nd> t;
 
     int Add(int a, char ch) {
-        dbg(a, ch);
         int b = t.size();
         t.push_back(nd());
         t[b].pr = a;
