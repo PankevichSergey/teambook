@@ -1,65 +1,81 @@
-int bitrev[NN];
-int w[NN];
+const int LOG = 20;
+const int N = 1 << LOG;
+const int NN = N + 5;
 
-void init() {
+int bitrev[NN];
+M w[NN];
+
+#warning call initfft
+bool init_was_called = false;
+void initfft() {
+    init_was_called = true;
     int W = 2;
     while (true) {
-        ll x = W;
-        fi(1, LOG)
-            x = mult(x, x);
-        if (x == MOD - 1) break;
+        M x = W;
+        for (int i = 1; i < LOG; ++i) {
+            x *= x;
+        }
+        if (x + 1 == M(0)) break;
         ++W;
     }
     w[0] = 1;
-    fi(1, N) {
+    for (int i = 1; i < N; ++i) {
         bitrev[i] = (bitrev[i >> 1] >> 1) ^ ((i & 1) << (LOG - 1));
-        w[i] = mult(w[i - 1], W);
+        w[i] = w[i - 1] * W;
     }
 }
 
 
-void fft(vi &a, int k) {
+void fft(vector<M> &a, int k) {
+    assert(init_was_called);
     int L = 1 << k;
-    fi(0, L) {
+    for (int i = 0; i < L; ++i) {
         int x = bitrev[i] >> (LOG - k);
         if (x > i) {
             swap(a[i], a[x]);
         }
     }
-    rep(lvl, 0, k) {
+    for (int lvl = 0; lvl < k; ++lvl) {
         int len = 1 << lvl;
         for (int i = 0; i < L; i += (len << 1)) {
-            fj(0, len) {
-                int x = a[i + j];
-                int y = mult(w[j << (LOG - 1 - lvl)], a[i + j + len]);
-                a[i + j] = add(x, y);
-                a[i + j + len] = sub(x, y);
+            for (int j = 0; j < len; ++j) {
+                M x = a[i + j];
+                M y = w[j << (LOG - 1 - lvl)] * a[i + j + len];
+                a[i + j] = x + y;
+                a[i + j + len] = x - y;
             }
         }
     }
 }
 
-void invfft(vi & c, int k) {
+void invfft(vector<M> & c, int k) {
     fft(c, k);
     int L = 1 << k;
     reverse(c.begin() + 1, c.begin() + L);
-    int RL = rev(L);
-    fx(x, c)
-        x = mult(x, RL);
+    M RL = M(1) / M(L);
+    for (auto& x : c) {
+        x *= RL;
+    }
 }
 
-vi mult(vi a, vi b) {
+vector<M> mult(vector<M> a, vector<M> b) {
+    if (a.empty() || b.empty()) {
+        return {};
+    }
+    int c_size = a.size() + b.size() - 1;
     int k = 0;
-    while ((1 << k) < siz(a) + siz(b) - 1)
+    while ((1 << k) + 1 < a.size() + b.size()) {
         ++k;
+    }
     int L = 1 << k;
     a.resize(L, 0);
     b.resize(L, 0);
     fft(a, k);
     fft(b, k);
-    vi c(L);
-    fi(0, L)
-        c[i] = mult(a[i], b[i]);
-    invfft(c, k);
-    return c;
+    for (int i = 0; i < L; ++i) {
+        a[i] *= b[i];
+    }
+    invfft(a, k);
+    a.resize(c_size);
+    return a;
 }
