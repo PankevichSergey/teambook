@@ -43,7 +43,8 @@ struct Dinic {
         e[id ^ 1].flow -= x;
     }
     const T INF = numeric_limits<T>::max() / 2 - 2;
-
+    T bound;
+    const int LOG = ;
     queue<int> q;
 
     bool bfs() {
@@ -55,7 +56,7 @@ struct Dinic {
             int v = q.front();
             q.pop();
             for (int id : g[v]) {
-                if (e[id].can()) {
+                if (e[id].can() >= bound) {
                     int to = e[id].to;
                     if (dist[to] == INF) {
                         dist[to] = dist[v] + 1;
@@ -69,10 +70,10 @@ struct Dinic {
     vector<int> it;
     T dfs(int v, T curmin) {
         if (v == t) return curmin;
-        while (it[v] < g[v].size()) {
+        while (it[v] < (int)g[v].size()) {
             int id = g[v][it[v]];
             int to = e[id].to;
-            if (e[id].can() && dist[to] == dist[v] + 1) {
+            if (e[id].can() >= bound && dist[to] == dist[v] + 1) {
                 T res = dfs(to, min(curmin, e[id].can()));
                 if (res) {
                     flow(id, res);
@@ -85,11 +86,14 @@ struct Dinic {
     }
     T maxflow() {
         T res = 0;
-        while (bfs()) {
-            T delta;
-            it.assign(n, 0);
-            while (delta = dfs(s, INF)) {
-                res += delta;
+        for (int k = LOG - 1; k >= 0; --k) {
+            bound = 1ll << k;
+            while (bfs()) {
+                T delta;
+                it.assign(n, 0);
+                while ((delta = dfs(s, INF))) {
+                    res += delta;
+                }
             }
         }
         return res;
