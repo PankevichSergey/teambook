@@ -1,7 +1,8 @@
 const int MAX_MEM = 1e8;
 int mpos = 0;
-char mem[MAX_MEM];
+alignas (long long) char mem[MAX_MEM];
 inline void * operator new ( size_t n ) {
+	if (mpos & 7) mpos += 8 - (mpos & 7)
 	char *res = mem + mpos;
 	mpos += n;
 	assert(mpos <= MAX_MEM);
