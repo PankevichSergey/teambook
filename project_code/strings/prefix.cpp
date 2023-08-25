@@ -1,7 +1,7 @@
-vi pf(str &s) {
+vector<int> pf(string& s) {
     int n = s.size();
-    vi p(n, 0);
-    fi(1, n) {
+    vector<int> p(n, 0);
+    for (int i = 1; i < n; ++i) {
         int cur = i - 1;
         while (cur >= 0) {
             if (s[i] == s[p[cur]]) {
