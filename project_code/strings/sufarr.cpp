@@ -2,34 +2,30 @@
 // const int LOG = 18;
  
 struct Sufarr {
-    int cnt[N];
-    int c[N];
-    int cn[N];
-    int p[N];
-    int pn[N];
+    vector<int> cnt;
+    vector<int> c;
+    vector<int> cn;
+    vector<int> p;
+    vector<int> pn;
+    vector<int> lcp;
+    vector<int> pos;
+    vector<vector<int>> st;
     int classes;
-    int lcp[N];
-    int pos[N];
     int n;
-    int st[LOG][N];
-    int pw2[N];
 	
     void BuildSparse() {
+        int k = 0;
+        while ((1 << k) < n) ++k;
+        st = vector<vector<int>>(k, vector<int>(n));
         for (int i = 0; i < n; ++i) {
             st[0][i] = lcp[i];
         }
-        for (int i = 1; i < LOG; ++i) {
+        for (int i = 1; i < k; ++i) {
             for (int j = 0; j + (1 << i) <= n; ++j) {
                 st[i][j] = min(st[i - 1][j], st[i - 1][j + (1 << (i - 1))]);
             }
         }
-        pw2[1] = 0;
-        for (int i = 2; i < N; ++i) {
-            pw2[i] = pw2[i - 1] + 1;
-            if (i < (1 << pw2[i])) {
-                --pw2[i];
-            }
-        }
+       
     }
  
     inline int getlcp(int l, int r) { // 0-based interval

@@ -659,7 +659,12 @@ vector<line> common_tangents(cir w1, cir w2) {
 }
 
 void solve() {
-    
+    int n, l;
+    cin >> n >> l;
+    vector<pt> poly(n);
+    cin >> poly;
+    cout << setprecision(15) << fixed;
+    cout << perimeter(build_hull(poly)) + 2 * PI * l << '\n';
 }
 
 int main() {

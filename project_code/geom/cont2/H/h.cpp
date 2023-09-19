@@ -659,7 +659,48 @@ vector<line> common_tangents(cir w1, cir w2) {
 }
 
 void solve() {
-    
+    int n;
+    cin >> n;
+    if (n == 1) {
+        cout << "1\n";
+        return;
+    }
+    vector<pt> pts(n);
+    cin >> pts;
+    map<pt, int> id;
+    for (int i = 0; i < n; ++i) {
+        id[pts[i]] = i;
+    }
+    pt a = *min_element(all(pts));
+    pt b = *max_element(all(pts));
+    vector<pt> up;
+    vector<pt> down;
+    bool ne = false;
+    line l(a, b);
+    for (pt p : pts) {
+        int s = sgn(l.get(p));
+        if (s == 0) {
+            up.push_back(p);
+        } else if (s == 1) {
+            up.push_back(p);
+            ne = true;
+        } else {
+            down.push_back(p);
+            ne = true;
+        }
+    }
+    if (!ne) {
+        cout << "No solution\n";
+        return;
+    }
+    sort(all(up));
+    sort(all(down));
+    reverse(all(down));
+    up.insert(up.end(), all(down));
+    for (pt p : up) {
+        cout << id[p] + 1 << ' ';
+    }
+    cout << '\n';
 }
 
 int main() {

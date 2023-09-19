@@ -659,7 +659,49 @@ vector<line> common_tangents(cir w1, cir w2) {
 }
 
 void solve() {
-    
+    int n, k;
+    cin >> n >> k;
+    --k;
+    vector<pt> pts(n);
+    cin >> pts;
+    reverse(all(pts));
+    vector<ld> kek(2 * n, 0);
+    for (int i = 1; i < 2 * n; ++i) {
+        kek[i] += dist(pts[i % n], pts[(i - 1) % n]);
+    }
+    int m;
+    cin >> m;
+    cout << setprecision(15) << fixed;
+    vector<ld> pog(n);
+    ld sum = 0;
+    for (int i = 0; i < n; ++i) {
+        int j = (k + i) % n;
+        pog[j] = sum;
+        int jj = (j + 1) % n;
+        sum += dist(pts[j], pts[jj]);
+    }
+    sum = 0;
+    for (int i = 0; i < n; ++i) {
+        int j = (k - i + n) % n;
+        mine(pog[j], sum);
+        int jj = (j - 1 + n) % n;
+        sum += dist(pts[j], pts[jj]);
+    }
+    for (int i = 0; i < m; ++i) {
+        pt p;
+        cin >> p;
+        auto[l, r] = tangents_alex(pts, p);
+        //dbg(l, r);
+        if (r < l) {
+            r += n;
+        }
+        //dbg(l, r, pts[l % n], pts[r % n], pts[(l + 1) % n]);
+        if ((k >= l && k <= r) || (k + n >= l && k + n <= r)) {
+            cout << dist(p, pts[k]) << '\n';
+        } else {
+            cout << min(dist(p, pts[l % n]) + pog[l % n], dist(p, pts[r % n]) + pog[r % n]) << '\n';
+        }
+    }
 }
 
 int main() {

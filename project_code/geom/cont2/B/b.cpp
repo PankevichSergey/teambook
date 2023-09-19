@@ -659,7 +659,21 @@ vector<line> common_tangents(cir w1, cir w2) {
 }
 
 void solve() {
-    
+    int n;
+    cin >> n;
+    vector<pt> pts(n);
+    cin >> pts;
+    pts = build_hull(pts);
+    ld ans = area(pts);
+    cout << pts.size() << '\n';
+    for (pt p : pts) {
+        cout << (long long)round(p.x)  << ' ' << (long long)round(p.y) << '\n';
+    }
+    if (abs(ans - round(ans)) < 0.25) {
+        cout << (long long)(round(ans)) << '\n';
+    } else {
+        cout << (long long)(floor(ans)) << ".5\n";
+    }
 }
 
 int main() {

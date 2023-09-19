@@ -658,8 +658,71 @@ vector<line> common_tangents(cir w1, cir w2) {
     return res;
 }
 
+const int N = 1e5 + 10;
+const int MOD = 998244353;
+ll dp[N][4];
+
 void solve() {
-    
+    int n, w, h;
+    cin >> n >> w >> h;
+    vector<vector<pt>> polys(n);
+    for (int i = 0; i < n; ++i) {
+        int k;
+        cin >> k;
+        polys[i].resize(k);
+        cin >> polys[i];
+    }
+    vector<int> inds(n);
+    iota(all(inds), 0);
+    vector<ld> s(n);
+    for (int i = 0; i < n; ++i) {
+        s[i] = area(polys[i]);
+    }
+    sort(all(inds), [&](int i, int j) {
+        return s[i] > s[j];
+    });
+    auto chx = [&](ld& kek) {
+        kek = w - kek;
+    };
+    auto chy = [&](ld& kek) {
+        kek = h - kek;
+    };
+    vector<vector<vector<pt>>> pts(n, vector<vector<pt>>(4));
+    for (int i = 0; i < n; ++i) {
+        pts[i][0] = pts[i][1] = pts[i][2] = pts[i][3] = polys[inds[i]];
+        for (int k = 0; k < polys[i].size(); ++k) {
+            chx(pts[i][1][k].x);
+            chx(pts[i][3][k].x);
+            chy(pts[i][2][k].y);
+            chy(pts[i][3][k].y);
+        }
+        reverse(all(pts[i][1]));
+        reverse(all(pts[i][3]));
+    }
+    for (int i = 0; i < 4; ++i) {
+        dp[0][i] = 1;
+    }
+    for (int i = 1; i < n; ++i) {
+        for (int j = 0; j <= 3; ++j) {
+            for (int k = 0; k <= 3; ++k) {
+                bool ok = true;
+                for (pt p : pts[i][k]) {
+                    if (!is_in_convex_poly(pts[i - 1][j], p)) {
+                        ok = false;
+                        break;
+                    }
+                }
+                dp[i][k] += dp[i - 1][j] * ok;
+                dp[i][k] %= MOD; 
+            }   
+        }
+    }
+    ll ans = 0;
+    for (int i = 0; i < 4; ++i) {
+        ans += dp[n - 1][i];
+    }
+    ans %= MOD;
+    cout << ans << '\n';
 }
 
 int main() {

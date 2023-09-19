@@ -659,7 +659,52 @@ vector<line> common_tangents(cir w1, cir w2) {
 }
 
 void solve() {
-    
+    vector<vector<pt>> polys;
+    vector<ld> s;
+    int n;
+    cin >> n;
+    for (int i = 0; i < n; ++i) {
+        polys.push_back({});
+        int k;
+        cin >> k;
+        polys[i].resize(k);
+        cin >> polys[i];
+        s.push_back(area(polys[i]));
+    }
+    vector<int> p(n);
+    iota(all(p), 0);
+    sort(all(p), [&](int i, int j) {
+        return s[i] < s[j];
+    });
+    vector<int> marked(n, 0);
+    int m;
+    cin >> m;
+    for (int i = 0; i < m; ++i) {
+        pt kek;
+        cin >> kek;
+        if (!is_in_convex_poly(polys[p.back()], kek)) {
+            continue;
+        }
+        int R = n - 1;
+        int L = -1;
+        while (R - L > 1) {
+            int mid = (L + R) / 2;
+            if (is_in_convex_poly(polys[p[mid]], kek)) {
+                R = mid;
+            } else {
+                L = mid;
+            }
+        }
+        marked[R] = 1;
+    }
+    ld ans = 0;
+    for (int i = 0; i < n; ++i) {
+        if (marked[i]) {
+            ans += s[p[i]] - (i == 0 ? 0 : s[p[i - 1]]);
+        }
+    }
+    cout << setprecision(6) << fixed;
+    cout << ans << '\n';
 }
 
 int main() {

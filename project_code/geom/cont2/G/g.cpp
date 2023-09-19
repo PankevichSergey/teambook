@@ -659,7 +659,13 @@ vector<line> common_tangents(cir w1, cir w2) {
 }
 
 void solve() {
-    
+    int n;
+    cin >> n;
+    pt a;
+    vector<pt> pts(n);
+    cin >> a >> pts;
+    pts = build_hull(pts);
+    cout << (is_in_poly_slow(pts, a, true) ? "NO\n" : "YES\n");
 }
 
 int main() {

@@ -659,7 +659,18 @@ vector<line> common_tangents(cir w1, cir w2) {
 }
 
 void solve() {
-    
+    int n, m, k;
+    cin >> n >> m >> k;
+    vector<pt> poly(n);
+    cin >> poly;
+    for (int i = 0; i < m; ++i) {
+        pt p;
+        cin >> p;
+        if (is_in_convex_poly(poly, p)) {
+            --k;
+        }
+    }
+    cout << (k <= 0 ? "YES\n" : "NO\n");
 }
 
 int main() {

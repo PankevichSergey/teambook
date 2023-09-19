@@ -126,9 +126,8 @@ using vvi = V<vi>;
 using vvl = V<vl>;
 using vvch = V<vch>;
 
-
 const ld PI = 4 * atan(1);
-const ld EPS = 1e-9;
+const ld EPS = 1e-8;
 
 int sgn(ld x) {
     if (x > EPS)
@@ -147,7 +146,8 @@ ld fix_angle(ld x) {
 }
 
 ld mysqrt(ld x) {
-    if (x < 0) return 0;
+    if (x < 0)
+        return 0;
     return sqrt(x);
 }
 
@@ -156,7 +156,7 @@ ld sqr(ld x) {
 }
 
 bool eq(ld a, ld b) {
-    return abs(a - b) < EPS;
+    return abs(a - b) <= EPS;
 }
 
 bool lt(ld a, ld b) {
@@ -168,20 +168,20 @@ bool gt(ld a, ld b) {
 }
 
 bool leq(ld a, ld b) {
-    return a - EPS < b;
+    return a - EPS <= b;
 }
 
 bool geq(ld a, ld b) {
-    return a + EPS > b;
+    return a + EPS >= b;
 }
 
 struct pt {
     ld x = 0;
     ld y = 0;
     pt() = default;
-    explicit pt (ld x, ld y): x(x), y(y) {
+    explicit pt(ld x, ld y) : x(x), y(y) {
     }
-    explicit pt (pt a, pt b) {
+    explicit pt(pt a, pt b) {
         x = b.x - a.x;
         y = b.y - a.y;
     }
@@ -190,57 +190,60 @@ struct pt {
         return pt(-y, x);
     }
 
-    pt norm() {
+    pt norm() const {
         ld d = len();
         assert(sgn(d) == 1);
         return pt(x / d, y / d);
     }
 
-    pt turn(ld a) {
+    pt turn(ld a) const {
         return pt(x * cos(a) - y * sin(a), x * sin(a) + y * cos(a));
     }
 
-    ld len2() {
+    ld len2() const {
         return x * x + y * y;
     }
 
-    ld len() {
+    ld len() const {
         return sqrt(x * x + y * y);
     }
 
-    pt operator + (pt p) {
+    pt operator+(pt p) const {
         return pt(x + p.x, y + p.y);
     }
 
-    pt operator * (ld d) {
-        return pt(x * d, y * d);
+    pt operator-(pt p) const {
+        return pt(x - p.x, y - p.y);
     }
 
-    ld operator * (pt p) {
+    pt operator*(ld d) const {
+        return pt(x * d, y * d);
+    }
+    ld operator*(pt p) const {
         return x * p.y - y * p.x;
     }
 
-    ld operator ^ (pt p) {
+    ld operator^(pt p) const {
         return x * p.x + y * p.y;
     }
 
-    bool operator == (const pt& rhs) const {
+    bool operator==(const pt &rhs) const {
         return eq(x, rhs.x) && eq(y, rhs.y);
     }
 
-    bool operator < (const pt & p) const {
+    bool operator<(const pt &p) const {
         return lt(x, p.x) || (eq(x, p.x) && lt(y, p.y));
     }
 };
 
-istream& operator >> (istream & cin, pt & p) {
-    cin >> p.x >> p.y;
-    return cin;
-} 
+istream &operator>>(istream &in, pt &p) {
+    in >> p.x >> p.y;
+    return in;
+}
 
-ostream& operator << (ostream & cout, pt & p) {
-    cout << p.x << ' ' << p.y;
-    return cout;
+ostream &operator<<(ostream &out, pt &p) {
+    out << p.x << ' ' << p.y;
+    return out;
 }
 
 #define vec pt
@@ -257,73 +260,38 @@ ld ang(pt a, pt b) {
     return atan2(a * b, a ^ b);
 }
 
-ld segdist(pt a, pt b, pt c) {
-    ld res = min(dist(a, c), dist(b, c));
-    vec ab(a, b);
-    vec ac(a, c);
-    vec ba(b, a);
-    vec bc(b, c);   
-    if ((ab ^ ac) > 0 && (ba ^ bc) > 0) 
-        return abs(ac * bc) / dist(a, b);
-    return res;
-}
-
-vector<pt> build_hull(vector<pt> pts) {
-    int n = pts.size();
-    pt p = *min_element(all(pts));
-    for (int i = 0; i < n; ++i) {
-        pts[i] = pt(p, pts[i]);
-    }
-    sort(all(pts), [&](pt a, pt b){
-        auto prod = a * b;
-        if (eq(prod, 0)) {
-            return a.len() < b.len();
-        }
-        return a * b > 0;
-    });
-    vector<pt> hull = {pts[0]};
-    for (int i = 1; i < n; ++i) {
-        while (hull.size() > 1) {
-            if (leq(pt(hull[siz(hull) - 2], hull.back()) * pt(hull.back(), pts[i]), 0)) {
-                hull.ppb;
-            } else {
-                break;
-            }
-        }
-        hull.pb(pts[i]);
-    }
-    for (auto&x : hull) {
-        x = x + p;
-    }
-    return hull;
-}
-
 struct line {
     ld a = 0;
     ld b = 0;
     ld c = 0;
     line() = default;
-    line (ld a, ld b, ld c): a(a), b(b), c(c) {}
-    line(pt p1, pt p2): a(p1.y - p2.y), b(p2.x - p1.x), c(-a * p1.x - b * p1.y) {}
-    ld eval(pt p) const {
+    line(ld a, ld b, ld c) : a(a), b(b), c(c) {
+    }
+    line(pt p1, pt p2) : a(p1.y - p2.y), b(p2.x - p1.x), c(-a * p1.x - b * p1.y) {
+        make_normal();
+    }
+    ld get(pt p) const {
         return p.x * a + p.y * b + c;
     }
     void make_normal() {
         ld norm = sqrt(a * a + b * b);
+        assert(sgn(norm) == 1);
         a /= norm;
         b /= norm;
         c /= norm;
     }
     ld dist(pt p) const {
-        return abs(p.x * a + p.y * b + c) / sqrt(a * a + b * b);
+        return abs(get(p)) / sqrt(sqr(a) + sqr(b));
     }
-    bool operator == (const line& other) const {
-        return eq(a * other.b, b * other.a) &&
-               eq(a * other.c, c * other.a) &&
-               eq(b * other.c, c * other.b);
+    pt project(pt p) const {
+        vec norm(a, b);
+        ld sd = get(p) / norm.len();
+        return p + (norm * (-sd / norm.len()));
+    }
+    bool operator==(const line &other) const {
+        return eq(a * other.b, b * other.a) && eq(a * other.c, c * other.a) && eq(b * other.c, c * other.b);
     }
 };
-
 
 bool are_parallel_lines(line f1, line f2) {
     return sgn(f1.a * f2.b - f1.b * f2.a) == 0;
@@ -332,19 +300,25 @@ bool are_parallel_lines(line f1, line f2) {
 pair<pt, int> cross_lines(line f1, line f2) {
     // 0 -- no intersection
     // 1 -- 1 point
-    // 2 -- coincide 
+    // 2 -- coincide
     ld d = f1.a * f2.b - f1.b * f2.a;
     if (sgn(d) == 0) {
         return {pt(), (f1 == f2 ? 2 : 0)};
-        if (f1 == f2) {
-            return {pt(), 2};
-        } else {
-            return {pt(), 0};
-        }
     }
     ld x = f1.c * f2.b - f1.b * f2.c;
     ld y = f1.a * f2.c - f1.c * f2.a;
     return {pt(x / -d, y / -d), 1};
+}
+
+ld dist_to_seg(pt a, pt b, pt c) {
+    ld res = min(dist(a, c), dist(b, c));
+    vec ab(a, b);
+    vec ac(a, c);
+    vec ba(b, a);
+    vec bc(b, c);
+    if ((ab ^ ac) > 0 && (ba ^ bc) > 0)
+        return abs(ac * bc) / dist(a, b);
+    return res;
 }
 
 bool is_on_seg(pt a, pt b, pt c) {
@@ -358,30 +332,33 @@ bool is_on_seg(pt a, pt b, pt c) {
     return sgn(ab * ac) == 0 && sgn(ab ^ ac) >= 0 && sgn(ba ^ bc) >= 0;
 }
 
-
-bool are_crossed(ld l1, ld r1, ld l2, ld r2) { 
+bool are_crossed(ld l1, ld r1, ld l2, ld r2) {
     // at least one common point
-    if (l1 > r1) swap(l1, r1);
-    if (l2 > r2) swap(l2, r2);
+    if (l1 > r1)
+        swap(l1, r1);
+    if (l2 > r2)
+        swap(l2, r2);
     return geq(min(r1, r2), max(l1, l2));
 }
 
-
 bool are_crossed(pt a, pt b, pt c, pt d) {
     // at least one common point
-    if (!are_crossed(a.x, b.x, c.x, d.x)) return false;
-    if (!are_crossed(a.y, b.y, c.y, d.y)) return false;
+    if (!are_crossed(a.x, b.x, c.x, d.x))
+        return false;
+    if (!are_crossed(a.y, b.y, c.y, d.y))
+        return false;
     vec ab(a, b);
     vec ac(a, c);
     vec ad(a, d);
-    if (sgn(ab * ac) * sgn(ab * ad) == 1) return false;
+    if (sgn(ab * ac) * sgn(ab * ad) == 1)
+        return false;
     vec cd(c, d);
     vec ca(c, a);
     vec cb(c, b);
-    if (sgn(cd * ca) * sgn(cd * cb) == 1) return false;
+    if (sgn(cd * ca) * sgn(cd * cb) == 1)
+        return false;
     return true;
-}   
-
+}
 
 pair<pt, bool> intersect_segments(pt a, pt b, pt c, pt d) {
     if (a == b) {
@@ -400,10 +377,14 @@ pair<pt, bool> intersect_segments(pt a, pt b, pt c, pt d) {
     vec ad(a, d);
     if (eq(ab * ac, 0) && eq(ab * ad, 0)) {
         for (int i = 0; i < 2; ++i) {
-            if (is_on_seg(a, b, c)) return {c, 1};
-            if (is_on_seg(a, b, d)) return {c, 1};
+            if (is_on_seg(a, b, c))
+                return {c, true};
+            if (is_on_seg(a, b, d))
+                return {d, true};
+            swap(a, c);
+            swap(b, d);
         }
-        return {pt(), 0};
+        return {pt(), false};
     }
     auto res = cross_lines(line(a, b), line(c, d));
     assert(res.second != 2);
@@ -416,37 +397,172 @@ pair<pt, bool> intersect_segments(pt a, pt b, pt c, pt d) {
     return {pt(), 0};
 }
 
-
-bool is_outside(vector<pt>& poly, pt p) {
-    ld sum = 0;
-    for (int i = 0; i < poly.size(); ++i) {
-        int j = i + 1;
-        if (j == poly.size()) {
-            j = 0;
-        }
-        pt a = poly[i];
-        pt b = poly[j];
-        if (is_on_seg(poly[i], poly[j], p)) {
-            return false;
-        }
-        sum += ang(vec(p, a), vec(p, b));
+vector<int>& build_hull(vector<pt> pts) {
+    int n = pts.size();
+    pt p = pts[0];
+    for (int i = 0; i < n; ++i) {
+        mine(p, pts[i]);
     }
-    return sum < PI;
+    for (int i = 0; i < n; ++i) {
+        pts[i] = pt(p, pts[i]);
+    }
+    sort(all(pts), [&](pt a, pt b) {
+        if (eq(a * b, 0)) {
+            return a.len2() < b.len2();
+        }
+        return a * b > 0;
+    });
+    static vector<pt> hull;
+    static vector<int> inds;
+    hull = {pts[0]};
+    inds = {0};
+    
+    for (int i = 1; i < n; ++i) {
+        while (hull.size() > 1) {
+            if (leq(vec(hull[siz(hull) - 2], hull.back()) * vec(hull.back(), pts[i]), 0)) {
+                hull.ppb;
+                inds.ppb;
+            } else {
+                break;
+            }
+        }
+        hull.pb(pts[i]);
+        inds.push_back(i);
+    }
+    return inds;
 }
 
-ld perimeter(vector<pt>& p) {
-  ld ans = 0;
-  int n = p.size();
-  for (int i = 0; i < n; ++i) {
-    ans += vec(p[i], p[i + 1 < n ? i + 1 : 0]).len();
-  }
-  return ans;
+
+ld perimeter(const vector<pt> &p) {
+    int n = p.size();
+    ld ans = 0;
+    for (int i = 0; i < n; ++i) {
+        ans += pt(p[i], p[i + 1 < n ? i + 1 : 0]).len();
+    }
+    return ans;
+}
+
+ld area(const vector<pt> &p) {
+    int n = p.size();
+    ld res = 0;
+    for (int i = 0; i < n; ++i) {
+        res += p[i] * p[(i + 1 < n ? i + 1 : 0)];
+    }
+    return abs(res) / 2;
+}
+
+bool is_convex(const vector<pt> &p) {
+    // allows 3 points on one line
+    int n = p.size();
+    int was = 0;
+    for (int i = 0; i < n; ++i) {
+        int pr = (i == 0 ? n - 1 : i - 1);
+        int nx = (i + 1 == n ? 0 : i + 1);
+        int cur = sgn(vec(p[pr], p[i]) * vec(p[i], p[nx]));
+        if (was && cur && was != cur) {
+            return false;
+        }
+        if (cur)
+            was = cur;
+    }
+    return true;
+}
+
+bool is_in_poly_fast(vector<pt> &p, pt a, bool allow_bound) {
+    // adjust this constant
+    static const int ADDP = 1e9;
+    int n = p.size();
+    bool sum = false;
+    pt b = a + pt(ADDP, 1);
+    for (int i = 0; i < n; ++i) {
+        pt l = p[i];
+        pt r = p[i + 1 == n ? 0 : i + 1];
+        if (is_on_seg(l, r, a)) {
+            return allow_bound;
+        }
+        sum ^= are_crossed(a, b, l, r);
+    }
+    return sum;
+}
+
+bool is_in_poly_slow(vector<pt> &p, pt a, bool allow_bound) {
+    int n = p.size();
+    ld sum = 0;
+    for (int i = 0; i < n; ++i) {
+        pt l = p[i];
+        pt r = p[i + 1 == n ? 0 : i + 1];
+        if (is_on_seg(l, r, a)) {
+            return allow_bound;
+        }
+        sum += ang(vec(a, l), vec(a, r));
+    }
+    return abs(sum) > PI / 2;
+}
+
+bool is_in_angle(pt a, pt o, pt b, pt p) {
+    // works for non degenerate angle
+    if (vec(o, a) * vec(o, b) < 0) {
+        swap(a, b);
+    }
+    vec oa(o, a);
+    vec op(o, p);
+    vec ob(o, b);
+    return sgn(oa * op) >= 0 && sgn(op * ob) >= 0;
+}
+
+bool is_in_triangle(pt a, pt b, pt c, pt p) {
+    // works for non degenerate triangle
+    return is_in_angle(c, a, b, p) && is_in_angle(a, b, c, p);
+}
+
+bool is_in_convex_poly(vector<pt> &p, pt a) {
+    // works for non degenerate convex polygon in counterclockwise order
+    int n = p.size();
+    if (lt(vec(p[0], p[1]) * vec(p[0], a), 0))
+        return false;
+    if (gt(vec(p[0], p[n - 1]) * vec(p[0], a), 0))
+        return false;
+    int L = 1;
+    int R = n - 1;
+    while (R - L > 1) {
+        int mid = (L + R) / 2;
+        if (is_in_angle(p[1], p[0], p[mid], a)) {
+            R = mid;
+        } else {
+            L = mid;
+        }
+    }
+    return is_in_triangle(p[0], p[L], p[R], a);
+}
+
+pair<int, int> tangents_alex(vector<pt> &p, pt &a) {
+    // if p is counterclockwise visible part is 
+    // an arc from second to first
+    // otherwise idk if this even works)
+    int n = p.size();
+    int l = 0;
+    while ((1ll << (l + 1)) <= n)
+        ++l;
+    auto findWithSign = [&](int val) {
+        int i = 0;
+        for (int k = l; k >= 0; --k) {
+            int i1 = (i - (1 << k) + n) % n;
+            int i2 = (i + (1 << k)) % n;
+            if (sgn(vec(a, p[i1]) * vec(a, p[i])) == val)
+                i = i1;
+            if (sgn(vec(a, p[i2]) * vec(a, p[i])) == val)
+                i = i2;
+        }
+        return i;
+    };
+    return {findWithSign(1), findWithSign(-1)};
 }
 
 struct cir {
-    pt C;
+    pt c;
     ld r;
-    cir(pt C, ld r): C(C), r(r) {}
+    cir(pt c, ld r) : c(c), r(r) {
+    }
 
     cir(pt a, pt b, pt c) {
         pt mab((a.x + b.x) / 2, (a.y + b.y) / 2);
@@ -457,62 +573,131 @@ struct cir {
         vec ac = pt(a, c).perp();
         line l2(mac, mac + ac);
 
-        C = cross_lines(l1, l2).first;
-        r = dist(C, a);
-        assert(eq(r, dist(C, a)) && eq(r, dist(C, b)) && eq(r, dist(C, c))); 
+        c = cross_lines(l1, l2).first;
+        r = dist(c, a);
+        assert(eq(r, dist(c, a)) && eq(r, dist(c, b)) && eq(r, dist(c, c)));
     }
-    
+
     vector<pt> tang(pt p) {
-        ld d = dist(p, C);
-        if (eq(r, d))
+        // returns vector of tangent points to the circle from a given point
+        ld d = dist(p, c);
+        if (eq(d, r)) {
             return {p};
-        ld L = mysqrt(d * d - r * r);
-        ld a = acos(fix_angle(L / d));
-        vec pc(p, C);
-        pc = pc * (L / d);
-        return {p + pc.turn(a), p + pc.turn(-a)};
+        }
+        if (leq(d, r)) {
+            return {};
+        }
+        ld a = sqr(r) / d;
+        vec v = vec(c, p).norm();
+        pt mid = c + v * a;
+        ld x = mysqrt(sqr(r) - sqr(a));
+        v = v.perp();
+        return {mid + v * x, mid + v * (-x)};
     }
 };
 
+vector<pt> cross_circles(cir w1, cir w2) {
+    // returns all intersection points, but only 3 if circles coincide
 
+    if (w1.r < w2.r) {
+        swap(w1.c, w2.c);
+        swap(w1.r, w2.r);
+    }
+    if (eq(w1.r, w2.r) && w1.c == w2.c) {
+        return {w1.c + pt(w1.r, 0), w1.c + pt(-w1.r, 0), w1.c + pt(0, w1.r)};
+    }
+    ld len = dist(w1.c, w2.c);
+    if (gt(len, w1.r + w2.r) || gt(w1.r, len + w2.r)) {
+        return {};
+    }
+    ld d = (sqr(w1.r) - sqr(w2.r) + sqr(len)) / 2 / len;
+    vec v(w1.c, w2.c);
+    v = v.norm();
+    pt a = w1.c + v * d;
+    if (eq(len, w1.r + w2.r) || eq(w1.r, w2.r + len)) {
+        return {a};
+    }
+    v = v.perp() * sqrt(sqr(w1.r) - sqr(d));
+    return {a + v, a - v};
+}
 
-// vector<pt> cross_circles(cir w1, cir w2) {
-//     // returns all intersection points, but only 3 if circles coincide
+vector<pt> cross_circle_line(cir w, line l) {
+    // returns all the intersection points
+    ld len = l.dist(w.c);
+    if (lt(w.r, len)) {
+        return {};
+    }
+    pt p = l.project(w.c);
+    if (leq(w.r, len)) {
+        return {p};
+    }
+    ld x = mysqrt(sqr(w.r) - sqr(len));
+    vec dv = vec(-l.b, l.a).norm();
+    return {p + dv * x, p + dv * (-x)};
+}
 
-//     if (w1.r < w2.r) {
-//         swap(w1.c, w2.c);
-//         swap(w1.r, w2.r);
-//     }
-//     if (eq(w1.r, w2.r) && w1.c == w2.c) {
-//         return {w1.o + pt(w1.r, 0), w1.o + pt(-w1.r, 0), w1.o + pt(0, w1.r)};
-//     }
-//     ld len = (w1.c - w2.c).len();
-//     if (gt(len, w1.r + w2.r)|| gt(w1.r, len + w2.r)) {
-//         return {};
-//     }
-//     ld d = (sqr(w1.r) - sqr(w2.r) + sqr(len)) / 2 / len;
-//     vec v = (w2.c - w1.c).norm();
-//     pt a = w1.c + v * d;
-//     if (sgn(len - w1.r - w2.r) == 0 || sgn(len + w2.r - w1.r) == 0) {
-//         I1 = a;
-//         return 1;
-//     }
-//     v = v.ort() * sqrt(sqr(w1.r) - sqr(d));
-//     I1 = a + v;
-//     I2 = a - v;
-//     return 2;
-// }
+vector<line> common_tangents(cir w1, cir w2) {
+    // thx to igor markelov
+    vector<line> res;
+    auto calc = [&](pt c, ld r1, ld r2) {
+        ld r = r2 - r1;
+        ld z = sqr(c.x) + sqr(c.y);
+        ld d = z - sqr(r);
+        if (sgn(d) == -1)
+            return;
+        d = sqrt(abs(d));
+        line l;
+        l.a = (c.x * r + c.y * d) / z;
+        l.b = (c.y * r - c.x * d) / z;
+        l.c = r1;
+        res.push_back(l);
+    };
+    for (int i = -1; i <= 1; i += 2) {
+        for (int j = -1; j <= 1; j += 2) {
+            calc(pt(w2.c, w1.c), w1.r * i, w2.r * j);
+        }
+    }
+    for (auto &l : res) {
+        l.c -= l.a * w1.c.x + l.b * w1.c.y;
+    }
+    return res;
+}
 
-// vector<pt> cross_circles(cir w1, cir w2) {
-
-// }
-
+void solve() {
+    int n;
+    cin >> n;
+    vector<pt> pts(n);
+    cin >> pts;
+    vector<int> ans(n);
+    vector<int> rest(n);
+    vector<pt> tmp;
+    iota(all(rest), 0);
+    int t = 1;
+    while (rest.size()) {
+        dbg(rest);
+        for (int i : rest) {
+            tmp.push_back(pts[i]);
+        }
+        auto res = build_hull(tmp);
+        dbg(res);
+        for (int i : res) {
+            ans[rest[i]] = t;
+        }
+        sort(all(res));
+        reverse(all(res));
+        for (int i : res) {
+            rest.erase(rest.begin() + i);
+        }
+        ++t;
+    }
+}
 
 int main() {
-    line a(1, 1, 1);
-    line b(2, 2, 3);
-    line c(1, 1, 0);
-    line d(2, 0, 0);
-    cout << (a == b) << '\n';
-    cout << (c == d) << '\n';
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+    int t = 1;
+    // cin >> t;
+    while (t--) {
+        solve();
+    }
 }

@@ -659,7 +659,43 @@ vector<line> common_tangents(cir w1, cir w2) {
 }
 
 void solve() {
-    
+    int n;
+    cin >> n;
+    vector<pt> pts(n);
+    cin >> pts;
+    ld L = 1e9;
+    ld R = -L;
+    for (pt p : pts) {
+        maxe(R, p.x);
+        mine(L, p.x);
+    }
+    ld S = area(pts);
+    dbg(S);
+    vector<pt> help;
+    for (int i = 0; i < 50; ++i) {
+        ld mid = (L + R) / 2;
+        help.clear();
+        for (int j = 0; j < n; ++j) {
+            if (leq(pts[j].x, mid)) {
+                help.push_back(pts[j]);
+            }
+            int jj = (j + 1) % n;
+            if (sgn(pts[j].x - mid) == -sgn(pts[jj].x - mid)) {
+                ld dy = pts[jj].y - pts[j].y;
+                ld dx = pts[jj].x - pts[j].x;
+                pt kek(mid, pts[j].y + dy * (mid - pts[j].x) / dx);
+                help.push_back(kek);
+            }
+        }
+        ld cur = area(help);
+        if (cur * 2 < S) {
+            L = mid;
+        } else {
+            R = mid;
+        }
+    }
+    cout << setprecision(15) << fixed;
+    cout << (L + R) / 2 << '\n';
 }
 
 int main() {
