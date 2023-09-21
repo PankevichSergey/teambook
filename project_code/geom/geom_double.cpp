@@ -241,7 +241,7 @@ istream &operator>>(istream &in, pt &p) {
     return in;
 }
 
-ostream &operator<<(ostream &out, pt &p) {
+ostream &operator<<(ostream &out, const pt &p) {
     out << p.x << ' ' << p.y;
     return out;
 }
